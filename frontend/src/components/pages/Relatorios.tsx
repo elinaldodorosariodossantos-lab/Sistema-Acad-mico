@@ -4,6 +4,7 @@ import { Card } from '../common';
 import { useAlunos } from '../../hooks/useAlunos';
 import { useTurmas } from '../../hooks/useTurmas';
 import { useFrequencia } from '../../hooks/useFrequencia';
+import edukarLogo from '../../../EDUKARXP-horizontal.png';
 import './Relatorios.css';
 
 const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -18,6 +19,26 @@ const formatarPercentual = (valor: number) => `${valor.toFixed(2).replace('.', '
 const formatarData = (valor?: string) => valor
   ? new Date(`${valor}T00:00:00`).toLocaleDateString('pt-BR')
   : 'Não informada';
+const escapeHtml = (valor: unknown) => String(valor ?? '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#039;');
+
+let logoDataUrlCache: string | null = null;
+const carregarLogoDataUrl = async () => {
+  if (logoDataUrlCache) return logoDataUrlCache;
+  const response = await fetch(edukarLogo);
+  const blob = await response.blob();
+  logoDataUrlCache = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+  return logoDataUrlCache;
+};
 
 export const Relatorios: React.FC = () => {
   const { alunos } = useAlunos();
@@ -94,30 +115,94 @@ export const Relatorios: React.FC = () => {
   ]);
 
   const exportarPdf = async () => {
-    const [{ jsPDF }, { default: autoTable }] = await Promise.all([
+    const [{ jsPDF }, { default: autoTable }, logoDataUrl] = await Promise.all([
       import('jspdf'),
       import('jspdf-autotable'),
+      carregarLogoDataUrl(),
     ]);
     const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
-    doc.setFillColor(37, 99, 235); doc.rect(0, 0, doc.internal.pageSize.getWidth(), 72, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFontSize(20); doc.text('EDUKAR XP', 40, 31);
-    doc.setFontSize(11); doc.text(`Relatório de Frequência — ${periodo}`, 40, 53);
-    doc.setTextColor(15, 23, 42); doc.setFontSize(10);
-    doc.text(`Escopo: ${escopo} | Presenças: ${totalPresencas} | Faltas: ${totalFaltas} | Frequência: ${formatarPercentual(frequenciaMedia)}`, 40, 94);
-    autoTable(doc, { startY: 110, head: [['Data', 'Turma', 'Aluno', 'Presença', 'Professor', 'Conteúdo']], body: linhasExportacao, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [30, 41, 59] } });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const emitidoEm = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date());
+
+    doc.setFillColor(248, 250, 252); doc.rect(0, 0, pageWidth, 142, 'F');
+    doc.setFillColor(37, 99, 235); doc.rect(0, 0, 8, 142, 'F');
+    doc.addImage(logoDataUrl, 'PNG', 38, 22, 132, 43);
+    doc.setTextColor(15, 23, 42); doc.setFont('helvetica', 'bold'); doc.setFontSize(19);
+    doc.text('Relatório de Frequência', 196, 39);
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 116, 139); doc.setFontSize(9);
+    doc.text(`Período: ${periodo}   •   Escopo: ${escopo === 'GERAL' ? 'Todos' : escopo}`, 196, 57);
+    doc.text(`Emitido em ${emitidoEm}`, pageWidth - 38, 39, { align: 'right' });
+
+    const cards = [
+      { label: 'REGISTROS', value: frequenciasFiltradas.length, color: [37, 99, 235] },
+      { label: 'PRESENÇAS', value: totalPresencas, color: [5, 150, 105] },
+      { label: 'FALTAS', value: totalFaltas, color: [220, 38, 38] },
+      { label: 'FREQUÊNCIA', value: formatarPercentual(frequenciaMedia), color: [79, 70, 229] },
+    ] as const;
+    cards.forEach((card, index) => {
+      const x = 38 + index * 194;
+      doc.setFillColor(255, 255, 255); doc.roundedRect(x, 82, 176, 43, 6, 6, 'F');
+      doc.setDrawColor(226, 232, 240); doc.roundedRect(x, 82, 176, 43, 6, 6, 'S');
+      doc.setFillColor(card.color[0], card.color[1], card.color[2]); doc.roundedRect(x, 82, 4, 43, 2, 2, 'F');
+      doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.text(card.label, x + 14, 98);
+      doc.setTextColor(card.color[0], card.color[1], card.color[2]); doc.setFontSize(14); doc.text(String(card.value), x + 14, 116);
+    });
+
+    autoTable(doc, {
+      startY: 158,
+      margin: { left: 38, right: 38, bottom: 38 },
+      head: [['Data', 'Turma', 'Aluno', 'Presença', 'Professor', 'Conteúdo ministrado']],
+      body: linhasExportacao,
+      theme: 'plain',
+      styles: { fontSize: 8, cellPadding: 7, textColor: [51, 65, 85], lineColor: [226, 232, 240], lineWidth: { bottom: 0.5 } },
+      headStyles: { fillColor: [30, 64, 175], textColor: [255, 255, 255], fontStyle: 'bold', cellPadding: 8 },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+      columnStyles: { 0: { cellWidth: 65 }, 3: { cellWidth: 68 }, 4: { cellWidth: 105 } },
+      didDrawPage: ({ pageNumber }) => {
+        doc.setDrawColor(226, 232, 240); doc.line(38, pageHeight - 25, pageWidth - 38, pageHeight - 25);
+        doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+        doc.text('Edukar XP • Sistema Acadêmico Escolar', 38, pageHeight - 12);
+        doc.text(`Página ${pageNumber}`, pageWidth - 38, pageHeight - 12, { align: 'right' });
+      },
+    });
     doc.save(`FREQUENCIA_${escopo}_${mes}-${ano}.pdf`);
   };
 
-  const exportarWord = () => {
-    const linhas = linhasExportacao.map((linha) => `<tr>${linha.map((celula) => `<td>${celula}</td>`).join('')}</tr>`).join('');
-    const html = `<html><head><meta charset="utf-8"></head><body><h1>Relatório de Frequência</h1><p>Período: ${periodo}</p><p>Escopo: ${escopo}</p><p>Frequência: ${formatarPercentual(frequenciaMedia)}</p><table border="1" cellpadding="6"><tr><th>Data</th><th>Turma</th><th>Aluno</th><th>Presença</th><th>Professor</th><th>Conteúdo</th></tr>${linhas}</table></body></html>`;
+  const exportarWord = async () => {
+    const logoDataUrl = await carregarLogoDataUrl();
+    const linhas = linhasExportacao.map((linha) => `<tr>${linha.map((celula) => `<td>${escapeHtml(celula)}</td>`).join('')}</tr>`).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+      @page { size: A4 landscape; margin: 1.4cm; } body { color:#1e293b; font-family:Arial,sans-serif; font-size:10pt; }
+      .header { width:100%; padding-bottom:14px; border-bottom:3px solid #2563eb; } .logo { width:145px; }
+      h1 { margin:0 0 5px; color:#0f172a; font-size:22pt; } .muted { color:#64748b; font-size:9pt; }
+      .summary { width:100%; margin:18px 0; border-spacing:8px; } .summary td { padding:12px; border:1px solid #dbe3ee; background:#f8fafc; }
+      .summary small,.summary strong { display:block; } .summary small { color:#64748b; font-weight:bold; } .summary strong { margin-top:5px; color:#1d4ed8; font-size:16pt; }
+      .data { width:100%; border-collapse:collapse; } .data th { padding:9px; color:#fff; background:#1e40af; text-align:left; font-size:8pt; }
+      .data td { padding:8px; border-bottom:1px solid #e2e8f0; } .data tr:nth-child(even) td { background:#f8fafc; }
+      .footer { margin-top:18px; padding-top:9px; border-top:1px solid #e2e8f0; color:#64748b; font-size:8pt; }
+    </style></head><body><table class="header"><tr><td><img class="logo" src="${logoDataUrl}"></td><td><h1>Relatório de Frequência</h1><div class="muted">Período: ${escapeHtml(periodo)} &nbsp; | &nbsp; Escopo: ${escapeHtml(escopo === 'GERAL' ? 'Todos' : escopo)}</div></td></tr></table>
+    <table class="summary"><tr><td><small>REGISTROS</small><strong>${frequenciasFiltradas.length}</strong></td><td><small>PRESENÇAS</small><strong>${totalPresencas}</strong></td><td><small>FALTAS</small><strong>${totalFaltas}</strong></td><td><small>FREQUÊNCIA</small><strong>${formatarPercentual(frequenciaMedia)}</strong></td></tr></table>
+    <table class="data"><thead><tr><th>Data</th><th>Turma</th><th>Aluno</th><th>Presença</th><th>Professor</th><th>Conteúdo ministrado</th></tr></thead><tbody>${linhas}</tbody></table>
+    <div class="footer">Edukar XP • Sistema Acadêmico Escolar — Documento emitido em ${new Date().toLocaleString('pt-BR')}</div></body></html>`;
     baixarArquivo(new Blob([html], { type: 'application/msword' }), `FREQUENCIA_${escopo}_${mes}-${ano}.doc`);
   };
 
-  const exportarExcel = () => {
-    const linhas = [['Data', 'Turma', 'Aluno', 'Presença', 'Professor', 'Conteúdo'], ...linhasExportacao];
-    const csv = '\ufeff' + linhas.map((linha) => linha.map((celula) => `"${String(celula).replace(/"/g, '""')}"`).join(';')).join('\n');
-    baixarArquivo(new Blob([csv], { type: 'application/vnd.ms-excel;charset=utf-8' }), `FREQUENCIA_${escopo}_${mes}-${ano}.xls`);
+  const exportarExcel = async () => {
+    const logoDataUrl = await carregarLogoDataUrl();
+    const linhas = linhasExportacao.map((linha) => `<tr>${linha.map((celula) => `<td>${escapeHtml(celula)}</td>`).join('')}</tr>`).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+      body { font-family:Calibri,Arial,sans-serif; color:#1e293b; } table { border-collapse:collapse; }
+      .title { color:#0f172a; font-size:20pt; font-weight:bold; } .meta { color:#64748b; }
+      .metric-label { color:#64748b; background:#f1f5f9; font-weight:bold; } .metric { color:#1d4ed8; background:#f8fafc; font-size:15pt; font-weight:bold; }
+      th { padding:9px; color:#fff; background:#1e40af; text-align:left; } td { padding:7px; border:1px solid #dbe3ee; }
+      .spacer td { height:8px; border:0; }
+    </style></head><body><table><tr><td colspan="2" rowspan="2"><img src="${logoDataUrl}" width="150"></td><td colspan="4" class="title">Relatório de Frequência</td></tr>
+    <tr><td colspan="4" class="meta">Período: ${escapeHtml(periodo)} | Escopo: ${escapeHtml(escopo === 'GERAL' ? 'Todos' : escopo)}</td></tr><tr class="spacer"><td colspan="6"></td></tr>
+    <tr><td class="metric-label">REGISTROS</td><td class="metric-label">PRESENÇAS</td><td class="metric-label">FALTAS</td><td class="metric-label">FREQUÊNCIA</td><td colspan="2" class="meta">Emitido em ${new Date().toLocaleString('pt-BR')}</td></tr>
+    <tr><td class="metric">${frequenciasFiltradas.length}</td><td class="metric">${totalPresencas}</td><td class="metric">${totalFaltas}</td><td class="metric">${formatarPercentual(frequenciaMedia)}</td><td colspan="2"></td></tr>
+    <tr class="spacer"><td colspan="6"></td></tr><tr><th>Data</th><th>Turma</th><th>Aluno</th><th>Presença</th><th>Professor</th><th>Conteúdo ministrado</th></tr>${linhas}</table></body></html>`;
+    baixarArquivo(new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel;charset=utf-8' }), `FREQUENCIA_${escopo}_${mes}-${ano}.xls`);
   };
 
   const baixarArquivo = (blob: Blob, nome: string) => {
@@ -188,7 +273,7 @@ export const Relatorios: React.FC = () => {
         <h2>Gerar relatório filtrado</h2>
         <p>Confira um resumo antes de baixar o arquivo.</p>
       </div>
-      <button type="button" className="report-generate-button" disabled={!podeGerar} onClick={() => setResumoAberto(true)}>Gerar Relatório</button>
+      <button type="button" className="report-generate-button" disabled={!podeGerar} onClick={() => setResumoAberto(true)}>Gerar relatório</button>
     </Card>
 
     {resumoAberto && <Card padding="lg" className="report-preview-card">
