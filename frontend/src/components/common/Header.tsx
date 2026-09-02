@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FiMenu, FiX, FiMoon, FiSun, FiBell, FiLogOut } from 'react-icons/fi';
+import { FiMenu, FiMoon, FiSun, FiLogOut } from 'react-icons/fi';
 import { useAppStore } from '../../context/AppContext';
 import './Header.css';
 
@@ -16,7 +16,6 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const isDarkMode = useAppStore((state) => state.isDarkMode);
   const setIsDarkMode = useAppStore((state) => state.setIsDarkMode);
-  const notifications = useAppStore((state) => state.notifications);
 
   useEffect(() => {
     document.body.classList.toggle('dark-mode', isDarkMode);
@@ -26,8 +25,6 @@ export const Header: React.FC<HeaderProps> = ({
   const handleThemeToggle = () => {
     setIsDarkMode(!isDarkMode);
   };
-
-  const unreadCount = notifications.length;
 
   return (
     <header className="header">
@@ -43,11 +40,6 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="header-right">
-        <button className="header-notification-btn" aria-label="Notificações">
-          <FiBell size={20} />
-          {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
-        </button>
-
         <button
           className="header-theme-btn"
           onClick={handleThemeToggle}
