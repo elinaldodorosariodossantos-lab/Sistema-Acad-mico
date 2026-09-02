@@ -10,6 +10,7 @@ import { Layout } from './components/Layout';
 
 const Dashboard = lazy(() => import('./components/pages/Dashboard').then((module) => ({ default: module.Dashboard })));
 const Alunos = lazy(() => import('./components/pages/Alunos').then((module) => ({ default: module.Alunos })));
+const AlunoDetalhes = lazy(() => import('./components/pages/AlunoDetalhes').then((module) => ({ default: module.AlunoDetalhes })));
 const Turmas = lazy(() => import('./components/pages/Turmas').then((module) => ({ default: module.Turmas })));
 const Horarios = lazy(() => import('./components/pages/Horarios').then((module) => ({ default: module.Horarios })));
 const Frequencia = lazy(() => import('./components/pages/Frequencia').then((module) => ({ default: module.Frequencia })));
@@ -28,6 +29,15 @@ export const App: React.FC = () => {
           element={
             <Layout title="Dashboard">
               <Suspense fallback={null}><Dashboard /></Suspense>
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/alunos/:id"
+          element={
+            <Layout title="Dados do Aluno">
+              <Suspense fallback={null}><AlunoDetalhes /></Suspense>
             </Layout>
           }
         />

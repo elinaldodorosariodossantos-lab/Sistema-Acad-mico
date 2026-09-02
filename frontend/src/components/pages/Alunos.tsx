@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Button, Modal } from '../common';
 import {
   FiPlus,
@@ -30,14 +31,8 @@ const formatPhone = (value: string) => {
   return digits.length ? `(${digits}` : '';
 };
 
-const formatDate = (value?: string) => {
-  if (!value) return 'Não informado';
-  const [date] = value.split('T');
-  const [year, month, day] = date.split('-');
-  return year && month && day ? `${day}/${month}/${year}` : value;
-};
-
 export const Alunos: React.FC = () => {
+  const navigate = useNavigate();
   const {
     alunos,
     isLoading,
@@ -101,9 +96,6 @@ export const Alunos: React.FC = () => {
     useState('');
 
   const [editingAluno, setEditingAluno] =
-    useState<Aluno | null>(null);
-
-  const [viewingAluno, setViewingAluno] =
     useState<Aluno | null>(null);
 
   const [formData, setFormData] =
@@ -361,8 +353,9 @@ export const Alunos: React.FC = () => {
                         <td>
                           <div className="aluno-actions">
                             <button
+                              type="button"
                               className="action-btn view-btn"
-                              onClick={() => setViewingAluno(aluno)}
+                              onClick={() => navigate(`/alunos/${aluno.id}`)}
                               title="Visualizar"
                               aria-label={`Visualizar dados de ${aluno.nome}`}
                             >
@@ -370,21 +363,25 @@ export const Alunos: React.FC = () => {
                             </button>
 
                             <button
+                              type="button"
                               className="action-btn edit-btn"
                               onClick={() =>
                                 handleOpenModal(aluno)
                               }
                               title="Editar"
+                              aria-label={`Editar dados de ${aluno.nome}`}
                             >
                               <FiEdit2 size={18} />
                             </button>
 
                             <button
+                              type="button"
                               className="action-btn delete-btn"
                               onClick={() =>
                                 handleDelete(aluno.id)
                               }
                               title="Deletar"
+                              aria-label={`Excluir ${aluno.nome}`}
                             >
                               <FiTrash2 size={18} />
                             </button>
@@ -399,61 +396,6 @@ export const Alunos: React.FC = () => {
           </table>
         </div>
       </Card>
-
-      <Modal
-        isOpen={Boolean(viewingAluno)}
-        onClose={() => setViewingAluno(null)}
-        title="Dados do Aluno"
-        size="lg"
-        footer={
-          <div className="modal-actions">
-            <Button onClick={() => setViewingAluno(null)}>Fechar</Button>
-          </div>
-        }
-      >
-        {viewingAluno && (() => {
-          const turma = getTurmaInfo(viewingAluno.turma);
-          const endereco = [viewingAluno.endereco, viewingAluno.bairro, viewingAluno.cidade, viewingAluno.estado]
-            .filter(Boolean)
-            .join(', ');
-
-          return (
-            <div className="aluno-details">
-              <section className="aluno-details-section">
-                <h3>Dados do aluno</h3>
-                <dl className="aluno-details-grid">
-                  <div><dt>Nome completo</dt><dd>{viewingAluno.nome || 'Não informado'}</dd></div>
-                  <div><dt>CPF</dt><dd>{viewingAluno.cpf || 'Não informado'}</dd></div>
-                  <div><dt>Data de nascimento</dt><dd>{formatDate(viewingAluno.dataNascimento)}</dd></div>
-                  <div><dt>Status</dt><dd><span className={`status-badge status-${viewingAluno.status.toLowerCase()}`}>{viewingAluno.status}</span></dd></div>
-                </dl>
-              </section>
-
-              <section className="aluno-details-section">
-                <h3>Turma e horário</h3>
-                <dl className="aluno-details-grid">
-                  <div><dt>Turma</dt><dd>{viewingAluno.turma || 'Não informada'}</dd></div>
-                  <div><dt>Professor</dt><dd>{turma?.professor || 'Não informado'}</dd></div>
-                  <div><dt>Sala</dt><dd>{turma?.sala || 'Não informada'}</dd></div>
-                  <div><dt>Horário</dt><dd>{getHorarioTurma(viewingAluno.turma)}</dd></div>
-                  <div className="details-full"><dt>Dias de aula</dt><dd>{viewingAluno.diasAula?.length ? viewingAluno.diasAula.join(', ') : getDiasTurma(viewingAluno.turma)}</dd></div>
-                </dl>
-              </section>
-
-              <section className="aluno-details-section">
-                <h3>Dados do responsável</h3>
-                <dl className="aluno-details-grid">
-                  <div><dt>Nome</dt><dd>{viewingAluno.responsavel || 'Não informado'}</dd></div>
-                  <div><dt>CPF</dt><dd>{viewingAluno.cpfResponsavel || 'Não informado'}</dd></div>
-                  <div><dt>Telefone</dt><dd>{viewingAluno.telefone || 'Não informado'}</dd></div>
-                  <div><dt>E-mail</dt><dd>{viewingAluno.email || 'Não informado'}</dd></div>
-                  <div className="details-full"><dt>Endereço completo</dt><dd>{endereco || 'Não informado'}</dd></div>
-                </dl>
-              </section>
-            </div>
-          );
-        })()}
-      </Modal>
 
       <Modal
         isOpen={isModalOpen}

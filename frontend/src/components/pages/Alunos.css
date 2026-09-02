@@ -182,6 +182,82 @@ body.dark-mode .action-btn:hover {
   color: var(--danger-color);
 }
 
+.alunos-table .aluno-actions .action-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease,
+    background-color 160ms ease, color 160ms ease;
+}
+
+.alunos-table .aluno-actions .view-btn {
+  border-color: #bfdbfe;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.alunos-table .aluno-actions .edit-btn {
+  border-color: #fde68a;
+  color: #b45309;
+  background: #fffbeb;
+}
+
+.alunos-table .aluno-actions .delete-btn {
+  border-color: #fecaca;
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.alunos-table .aluno-actions .action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
+}
+
+.alunos-table .aluno-actions .view-btn:hover {
+  border-color: #60a5fa;
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.alunos-table .aluno-actions .edit-btn:hover {
+  border-color: #fbbf24;
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.alunos-table .aluno-actions .delete-btn:hover {
+  border-color: #f87171;
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.alunos-table .aluno-actions .action-btn:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.22);
+  outline-offset: 2px;
+}
+
+body.dark-mode .alunos-table .aluno-actions .view-btn {
+  border-color: rgba(96, 165, 250, 0.3);
+  color: #93c5fd;
+  background: rgba(37, 99, 235, 0.14);
+}
+
+body.dark-mode .alunos-table .aluno-actions .edit-btn {
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fcd34d;
+  background: rgba(217, 119, 6, 0.13);
+}
+
+body.dark-mode .alunos-table .aluno-actions .delete-btn {
+  border-color: rgba(248, 113, 113, 0.3);
+  color: #fca5a5;
+  background: rgba(220, 38, 38, 0.13);
+}
+
 .aluno-form {
   display: flex;
   flex-direction: column;
