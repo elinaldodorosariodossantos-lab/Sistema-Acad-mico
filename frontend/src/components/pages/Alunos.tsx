@@ -347,26 +347,28 @@ export const Alunos: React.FC = () => {
                           </span>
                         </td>
 
-                        <td className="aluno-actions">
-                          <button
-                            className="action-btn edit-btn"
-                            onClick={() =>
-                              handleOpenModal(aluno)
-                            }
-                            title="Editar"
-                          >
-                            <FiEdit2 size={18} />
-                          </button>
+                        <td>
+                          <div className="aluno-actions">
+                            <button
+                              className="action-btn edit-btn"
+                              onClick={() =>
+                                handleOpenModal(aluno)
+                              }
+                              title="Editar"
+                            >
+                              <FiEdit2 size={18} />
+                            </button>
 
-                          <button
-                            className="action-btn delete-btn"
-                            onClick={() =>
-                              handleDelete(aluno.id)
-                            }
-                            title="Deletar"
-                          >
-                            <FiTrash2 size={18} />
-                          </button>
+                            <button
+                              className="action-btn delete-btn"
+                              onClick={() =>
+                                handleDelete(aluno.id)
+                              }
+                              title="Deletar"
+                            >
+                              <FiTrash2 size={18} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
