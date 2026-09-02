@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Button } from '../common';
-import { FiBookOpen, FiCalendar, FiCheckCircle, FiClock, FiSave, FiUsers, FiXCircle } from 'react-icons/fi';
+import { FiBookOpen, FiCalendar, FiCheckCircle, FiClock, FiEdit3, FiMessageSquare, FiSave, FiUsers, FiXCircle } from 'react-icons/fi';
 import { useFrequencia } from '../../hooks/useFrequencia';
 import { useTurmas } from '../../hooks/useTurmas';
 import { useAlunos } from '../../hooks/useAlunos';
@@ -459,48 +459,36 @@ export const Frequencia: React.FC = () => {
               </div>
             </Card>
 
-            <Card padding="lg">
-              <div className="frequencia-section-heading"><span><FiBookOpen /></span><div><h3>Conteúdo da Aula</h3><p>Registre o tema e as observações da aula.</p></div></div>
-
-              <div className="form-group">
-                <label>
-                  Tema da Aula
-                </label>
-
-                <input
-                  type="text"
-                  placeholder="Digite o tema da aula..."
-                  value={
-                    conteudoGeral
-                  }
-                  onChange={(e) =>
-                    setConteudoGeral(
-                      e.target
-                        .value
-                    )
-                  }
-                />
+            <Card padding="lg" className="frequencia-content-card">
+              <div className="frequencia-content-heading">
+                <div className="frequencia-section-heading"><span><FiBookOpen /></span><div><h3>Conteúdo da Aula</h3><p>Registre de forma clara o que foi trabalhado com a turma.</p></div></div>
+                <div className="frequencia-class-context"><span><FiCalendar /> {new Date(`${selectedData}T12:00:00`).toLocaleDateString('pt-BR')}</span><span><FiUsers /> {turmaAtual.nome}</span></div>
               </div>
 
-              <div className="form-group">
-                <label>
-                  Observações
-                  Gerais
-                </label>
+              <div className="frequencia-content-fields">
+                <div className="content-field topic-field">
+                  <div className="content-field-label"><span><FiEdit3 /></span><div><label htmlFor="tema-aula">Tema da aula</label><small>Assunto principal apresentado aos alunos</small></div></div>
+                  <input
+                    id="tema-aula"
+                    type="text"
+                    placeholder="Ex.: Introdução à programação e lógica"
+                    value={conteudoGeral}
+                    onChange={(e) => setConteudoGeral(e.target.value)}
+                  />
+                  <span className="content-field-counter">{conteudoGeral.length} caracteres</span>
+                </div>
 
-                <textarea
-                  placeholder="Digite observações gerais da aula..."
-                  value={
-                    observacoesGeral
-                  }
-                  onChange={(e) =>
-                    setObservacoesGeral(
-                      e.target
-                        .value
-                    )
-                  }
-                  rows={3}
-                />
+                <div className="content-field notes-field">
+                  <div className="content-field-label"><span><FiMessageSquare /></span><div><label htmlFor="observacoes-aula">Observações gerais</label><small>Anotações importantes sobre o desenvolvimento da aula</small></div></div>
+                  <textarea
+                    id="observacoes-aula"
+                    placeholder="Ex.: Participação da turma, atividades realizadas e pontos para a próxima aula"
+                    value={observacoesGeral}
+                    onChange={(e) => setObservacoesGeral(e.target.value)}
+                    rows={4}
+                  />
+                  <span className="content-field-counter">{observacoesGeral.length} caracteres</span>
+                </div>
               </div>
             </Card>
 
