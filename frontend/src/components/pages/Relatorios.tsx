@@ -260,13 +260,6 @@ export const Relatorios: React.FC = () => {
       </div>
     </Card>
 
-    <Card padding="lg" className="report-card-block">
-      <div className="report-section-title"><div><span>TURMAS</span><h2>Informações das Turmas</h2></div></div>
-      <div className="report-table-wrap"><table className="report-table"><thead><tr><th>Turma</th><th>Professor</th><th>Horário</th><th>Alunos</th></tr></thead><tbody>
-        {turmasOrdenadas.map((turma) => <tr key={turma.id}><td><strong>{turma.nome}</strong></td><td>{turma.professor || 'Não informado'}</td><td>{turma.horaInicio && turma.horaFim ? `${turma.horaInicio} - ${turma.horaFim}` : turma.horario || 'Não informado'}</td><td>{alunos.filter((aluno) => aluno.turma === turma.nome || aluno.turma === turma.id).length}</td></tr>)}
-      </tbody></table></div>
-    </Card>
-
     <Card padding="lg" className="report-generator-card">
       <div>
         <span>RELATÓRIO DE FREQUÊNCIA</span>
