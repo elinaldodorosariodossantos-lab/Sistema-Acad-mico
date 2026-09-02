@@ -42,4 +42,4 @@ O arquivo `.env` contém os valores locais e não deve ser enviado ao repositór
 
 ## Validação
 
-Dentro de `frontend`, use `npm run build` para executar a verificação do TypeScript e gerar a aplicação de produção.
+Na raiz do projeto, use `npm run build` para executar a verificação do TypeScript e gerar a aplicação de produção. O comando é encaminhado automaticamente para `frontend`.

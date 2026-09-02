@@ -8,11 +8,10 @@
 
 ## 1. Instalar dependências
 
-Entre na pasta do frontend e instale as dependências:
+Na raiz do projeto, instale as dependências do frontend:
 
 ```bash
-cd frontend
-npm install
+npm run install:frontend
 ```
 
 ## 2. Configurar o Supabase
@@ -41,6 +40,8 @@ Encontre esses valores no painel do Supabase em **Project Settings > API**. Use 
 - Desenvolvimento: `npm run dev`
 - Build de produção: `npm run build`
 - Pré-visualização: `npm run preview`
+
+Todos esses comandos devem ser executados na raiz do projeto e são encaminhados automaticamente para `frontend`.
 
 ## Solução de problemas
 

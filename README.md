@@ -113,8 +113,8 @@ EDUKAR-XP/
 ### 1. Instale as dependências
 
 ```bash
-cd frontend
 npm install
+npm run install:frontend
 ```
 
 ### 2. Configure o ambiente
@@ -155,6 +155,9 @@ npm run build
 - `npm run dev` — inicia o ambiente de desenvolvimento
 - `npm run build` — verifica o TypeScript e gera a aplicação de produção
 - `npm run preview` — visualiza localmente a versão de produção
+- `npm run install:frontend` — instala as dependências da aplicação
+
+Esses comandos podem ser executados diretamente na raiz do projeto e são encaminhados automaticamente para a pasta `frontend`.
 
 ## Segurança
 
