@@ -14,7 +14,9 @@ export const Header: React.FC<HeaderProps> = ({
   title = 'Controle de Aulas',
   showMenu = true,
 }) => {
-  const { isDarkMode, setIsDarkMode, notifications } = useAppStore();
+  const isDarkMode = useAppStore((state) => state.isDarkMode);
+  const setIsDarkMode = useAppStore((state) => state.setIsDarkMode);
+  const notifications = useAppStore((state) => state.notifications);
 
   useEffect(() => {
     document.body.classList.toggle('dark-mode', isDarkMode);

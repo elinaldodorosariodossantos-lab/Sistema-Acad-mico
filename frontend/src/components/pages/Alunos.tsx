@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Button, Modal } from '../common';
 import {
   FiPlus,
@@ -112,15 +112,17 @@ export const Alunos: React.FC = () => {
 
   const turmaSelecionada = formData.turma ? getTurmaInfo(formData.turma) : null;
 
-  const handleSearch = async (
-    term: string
-  ) => {
+  const handleSearch = (term: string) => {
     setSearchTerm(term);
-
-    if (term.length > 0) {
-      await searchAlunos(term);
-    }
   };
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void searchAlunos(searchTerm);
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [searchAlunos, searchTerm]);
 
   const handleOpenModal = (
     aluno?: Aluno
@@ -172,6 +174,7 @@ export const Alunos: React.FC = () => {
         await createAluno(
           formData as Omit<Aluno, 'id'>
         );
+        setSearchTerm('');
       }
 
       handleCloseModal();

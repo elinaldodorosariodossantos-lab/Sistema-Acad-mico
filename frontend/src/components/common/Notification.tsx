@@ -4,7 +4,8 @@ import { useAppStore } from '../../context/AppContext';
 import './Notification.css';
 
 export const Notification: React.FC = () => {
-  const { notifications, removeNotification } = useAppStore();
+  const notifications = useAppStore((state) => state.notifications);
+  const removeNotification = useAppStore((state) => state.removeNotification);
 
   const getIcon = (type: string) => {
     switch (type) {

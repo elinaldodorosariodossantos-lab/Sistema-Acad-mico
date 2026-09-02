@@ -1,89 +1,68 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { turmasService } from '../services/api';
 import type { Turma } from '../types';
 import { useAppStore } from '../context/AppContext';
 
+export const TURMAS_QUERY_KEY = ['turmas'] as const;
+
 export const useTurmas = () => {
-  const [turmas, setTurmas] = useState<Turma[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { addNotification } = useAppStore();
+  const queryClient = useQueryClient();
+  const addNotification = useAppStore((state) => state.addNotification);
+  const query = useQuery({
+    queryKey: TURMAS_QUERY_KEY,
+    queryFn: () => turmasService.getAll(),
+  });
 
   const fetchTurmas = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+    const result = await query.refetch();
+    return result.data ?? [];
+  }, [query.refetch]);
+
+  const createTurma = useCallback(async (turma: Omit<Turma, 'id'>) => {
     try {
-      const data = await turmasService.getAll();
-      setTurmas(data);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar turmas';
-      setError(errorMessage);
-      setTurmas([]);
-
-      const shouldIgnoreBackendError = /supabase|fetch failed|failed to fetch|network|not resolved|enotfound/i.test(errorMessage);
-      if (!shouldIgnoreBackendError) {
-        addNotification(errorMessage, 'error');
-      }
-    } finally {
-      setIsLoading(false);
+      const created = await turmasService.create(turma);
+      queryClient.setQueryData<Turma[]>(TURMAS_QUERY_KEY, (current = []) => [...current, created]);
+      addNotification('Turma criada com sucesso!', 'success');
+      return created;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao criar turma';
+      addNotification(message, 'error');
+      throw error;
     }
-  }, [addNotification]);
+  }, [addNotification, queryClient]);
 
-  const createTurma = useCallback(
-    async (turma: Omit<Turma, 'id'>) => {
-      try {
-        const newTurma = await turmasService.create(turma);
-        setTurmas((prev) => [...prev, newTurma]);
-        addNotification('Turma criada com sucesso!', 'success');
-        return newTurma;
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Erro ao criar turma';
-        addNotification(errorMessage, 'error');
-        throw err;
-      }
-    },
-    [addNotification]
-  );
+  const updateTurma = useCallback(async (id: string, turma: Partial<Turma>) => {
+    try {
+      const updated = await turmasService.update(id, turma);
+      queryClient.setQueryData<Turma[]>(TURMAS_QUERY_KEY, (current = []) =>
+        current.map((item) => item.id === id ? updated : item));
+      addNotification('Turma atualizada com sucesso!', 'success');
+      return updated;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao atualizar turma';
+      addNotification(message, 'error');
+      throw error;
+    }
+  }, [addNotification, queryClient]);
 
-  const updateTurma = useCallback(
-    async (id: string, turma: Partial<Turma>) => {
-      try {
-        const updated = await turmasService.update(id, turma);
-        setTurmas((prev) => prev.map((t) => (t.id === id ? updated : t)));
-        addNotification('Turma atualizada com sucesso!', 'success');
-        return updated;
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Erro ao atualizar turma';
-        addNotification(errorMessage, 'error');
-        throw err;
-      }
-    },
-    [addNotification]
-  );
-
-  const deleteTurma = useCallback(
-    async (id: string) => {
-      try {
-        await turmasService.delete(id);
-        setTurmas((prev) => prev.filter((t) => t.id !== id));
-        addNotification('Turma removida com sucesso!', 'success');
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Erro ao remover turma';
-        addNotification(errorMessage, 'error');
-        throw err;
-      }
-    },
-    [addNotification]
-  );
-
-  useEffect(() => {
-    fetchTurmas();
-  }, [fetchTurmas]);
+  const deleteTurma = useCallback(async (id: string) => {
+    try {
+      await turmasService.delete(id);
+      queryClient.setQueryData<Turma[]>(TURMAS_QUERY_KEY, (current = []) =>
+        current.filter((item) => item.id !== id));
+      addNotification('Turma removida com sucesso!', 'success');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao remover turma';
+      addNotification(message, 'error');
+      throw error;
+    }
+  }, [addNotification, queryClient]);
 
   return {
-    turmas,
-    isLoading,
-    error,
+    turmas: query.data ?? [],
+    isLoading: query.isLoading,
+    error: query.error instanceof Error ? query.error.message : null,
     fetchTurmas,
     createTurma,
     updateTurma,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 
 import {
   BrowserRouter as Router,
@@ -8,29 +8,26 @@ import {
 
 import { Layout } from './components/Layout';
 
-import {
-  Dashboard,
-  Alunos,
-  Turmas,
-  Horarios,
-  Frequencia,
-  Relatorios,
-  Financeiro
-} from './components/pages';
+const Dashboard = lazy(() => import('./components/pages/Dashboard').then((module) => ({ default: module.Dashboard })));
+const Alunos = lazy(() => import('./components/pages/Alunos').then((module) => ({ default: module.Alunos })));
+const Turmas = lazy(() => import('./components/pages/Turmas').then((module) => ({ default: module.Turmas })));
+const Horarios = lazy(() => import('./components/pages/Horarios').then((module) => ({ default: module.Horarios })));
+const Frequencia = lazy(() => import('./components/pages/Frequencia').then((module) => ({ default: module.Frequencia })));
+const Relatorios = lazy(() => import('./components/pages/Relatorios').then((module) => ({ default: module.Relatorios })));
+const Financeiro = lazy(() => import('./components/pages/Financeiro').then((module) => ({ default: module.Financeiro })));
 
 export const App: React.FC = () => {
 
   return (
 
     <Router>
-
       <Routes>
 
         <Route
           path="/"
           element={
             <Layout title="Dashboard">
-              <Dashboard />
+              <Suspense fallback={null}><Dashboard /></Suspense>
             </Layout>
           }
         />
@@ -39,7 +36,7 @@ export const App: React.FC = () => {
           path="/alunos"
           element={
             <Layout title="Alunos">
-              <Alunos />
+              <Suspense fallback={null}><Alunos /></Suspense>
             </Layout>
           }
         />
@@ -48,7 +45,7 @@ export const App: React.FC = () => {
           path="/turmas"
           element={
             <Layout title="Turmas">
-              <Turmas />
+              <Suspense fallback={null}><Turmas /></Suspense>
             </Layout>
           }
         />
@@ -57,7 +54,7 @@ export const App: React.FC = () => {
           path="/horarios"
           element={
             <Layout title="Horários">
-              <Horarios />
+              <Suspense fallback={null}><Horarios /></Suspense>
             </Layout>
           }
         />
@@ -66,7 +63,7 @@ export const App: React.FC = () => {
           path="/frequencia"
           element={
             <Layout title="Frequência">
-              <Frequencia />
+              <Suspense fallback={null}><Frequencia /></Suspense>
             </Layout>
           }
         />
@@ -75,7 +72,7 @@ export const App: React.FC = () => {
           path="/relatorios"
           element={
             <Layout title="Relatórios">
-              <Relatorios />
+              <Suspense fallback={null}><Relatorios /></Suspense>
             </Layout>
           }
         />
@@ -84,7 +81,7 @@ export const App: React.FC = () => {
           path="/financeiro"
           element={
             <Layout title="Controle Financeiro">
-              <Financeiro />
+              <Suspense fallback={null}><Financeiro /></Suspense>
             </Layout>
           }
         />

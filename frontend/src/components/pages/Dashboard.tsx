@@ -153,11 +153,11 @@ export const Dashboard: React.FC = () => {
     <div className="dashboard">
       <div className="dashboard-welcome">
         <div>
-          <span className="dashboard-eyebrow">VISÃO GERAL</span>
-          <h2>Acompanhamento acadêmico</h2>
-          <p>Confira os principais indicadores da sua instituição.</p>
+            <span className="dashboard-eyebrow"><i aria-hidden="true" /> PAINEL EM TEMPO REAL</span>
+            <h2>Acompanhamento acadêmico</h2>
+            <p>Uma visão clara dos principais indicadores da sua instituição.</p>
         </div>
-        <div className="dashboard-date"><FiCalendar aria-hidden="true" /><span><small>Atualizado agora</small><strong>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(agora)}</strong></span></div>
+          <div className="dashboard-date"><span className="dashboard-date-icon"><FiCalendar aria-hidden="true" /></span><span><small>Última atualização</small><strong>{new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(agora)}</strong></span></div>
       </div>
 
       <div className="dashboard-stats">

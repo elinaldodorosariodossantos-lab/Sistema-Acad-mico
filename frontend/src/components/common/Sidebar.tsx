@@ -35,6 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <img src={edukarLogo} alt="Edukar XP" className="sidebar-brand-image" />
+            <span className="sidebar-brand-subtitle">Sistema Acadêmico Escolar</span>
           </div>
         </div>
 
@@ -48,8 +49,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
                 className={({ isActive }) => `sidebar-nav-link ${isActive ? 'active' : ''}`}
                 onClick={onClose}
               >
-                <Icon size={20} />
-                <span>{item.label}</span>
+                <span className="sidebar-nav-icon">
+                  <Icon size={19} />
+                </span>
+                <span className="sidebar-nav-label">{item.label}</span>
               </NavLink>
             );
           })}

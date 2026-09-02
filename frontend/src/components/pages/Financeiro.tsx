@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { BadgeStatus, Button, Card } from '../common';
 import { useAlunos } from '../../hooks/useAlunos';
 import { useTurmas } from '../../hooks/useTurmas';
@@ -13,6 +14,9 @@ const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julh
 const anos = Array.from({ length: 6 }, (_, index) => new Date().getFullYear() - 2 + index);
 const statusOptions: FinanceiroStatus[] = ['Pago', 'Permuta', 'Pendente'];
 const modalidadeOptions: FinanceiroModalidade[] = ['Boleto', 'Permuta'];
+const FINANCEIRO_QUERY_KEY = ['financeiro', 'mensalidades'] as const;
+const FINANCEIRO_PERFIS_QUERY_KEY = ['financeiro', 'perfis'] as const;
+const FINANCEIRO_CURSOS_QUERY_KEY = ['financeiro', 'cursos'] as const;
 
 const getDefaultRow = (aluno: any, mes: number, ano: number, modalidade: FinanceiroModalidade, valorMensalidade = 0): FinanceiroAluno => ({
   alunoId: aluno.id,
@@ -28,6 +32,7 @@ const getDefaultRow = (aluno: any, mes: number, ano: number, modalidade: Finance
 });
 
 export const Financeiro: React.FC = () => {
+  const queryClient = useQueryClient();
   const { alunos, isLoading: loadingAlunos } = useAlunos();
   const { turmas, isLoading: loadingTurmas } = useTurmas();
   const hoje = new Date();
@@ -42,14 +47,21 @@ export const Financeiro: React.FC = () => {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [savingPerfis, setSavingPerfis] = useState(false);
   const [savingCursos, setSavingCursos] = useState(false);
+  const registrosQuery = useQuery({ queryKey: FINANCEIRO_QUERY_KEY, queryFn: () => financeiroService.getAll() });
+  const perfisQuery = useQuery({ queryKey: FINANCEIRO_PERFIS_QUERY_KEY, queryFn: () => financeiroPerfilService.getAll() });
+  const cursosQuery = useQuery({ queryKey: FINANCEIRO_CURSOS_QUERY_KEY, queryFn: () => financeiroCursoService.getAll() });
 
   useEffect(() => {
-    Promise.all([financeiroService.getAll(), financeiroPerfilService.getAll(), financeiroCursoService.getAll()]).then(([financeiro, perfisSalvos, cursosSalvos]) => {
-      setRegistros(financeiro);
-      setPerfis(perfisSalvos);
-      setCursosFinanceiros(cursosSalvos);
-    });
-  }, [alunos, turmas]);
+    if (registrosQuery.data) setRegistros(registrosQuery.data);
+  }, [registrosQuery.data]);
+
+  useEffect(() => {
+    if (perfisQuery.data) setPerfis(perfisQuery.data);
+  }, [perfisQuery.data]);
+
+  useEffect(() => {
+    if (cursosQuery.data) setCursosFinanceiros(cursosQuery.data);
+  }, [cursosQuery.data]);
 
   const alunosAtivos = useMemo(() => [...alunos]
     .filter((aluno) => aluno.status === 'Ativo')
@@ -146,6 +158,11 @@ export const Financeiro: React.FC = () => {
         ...mensalidadesSalvas,
         ...prev.filter((item) => item.mesReferencia !== mesFiltro || item.anoReferencia !== anoFiltro),
       ]);
+      queryClient.setQueryData(FINANCEIRO_PERFIS_QUERY_KEY, perfisSalvos);
+      queryClient.setQueryData<FinanceiroAluno[]>(FINANCEIRO_QUERY_KEY, (current = []) => [
+        ...mensalidadesSalvas,
+        ...current.filter((item) => item.mesReferencia !== mesFiltro || item.anoReferencia !== anoFiltro),
+      ]);
       setAbaAtiva('mensalidades');
     } finally { setSavingPerfis(false); }
   };
@@ -165,6 +182,7 @@ export const Financeiro: React.FC = () => {
         valorMensalidade: cursosFinanceiros.find((curso) => curso.turmaId === turma.id)?.valorMensalidade ?? 0,
       })));
       setCursosFinanceiros(cursosSalvos);
+      queryClient.setQueryData(FINANCEIRO_CURSOS_QUERY_KEY, cursosSalvos);
       setAbaAtiva('perfil');
     } finally { setSavingCursos(false); }
   };
@@ -194,6 +212,10 @@ export const Financeiro: React.FC = () => {
         boletoEmitido: 'Não',
       });
       setRegistros((prev) => [salvo, ...prev.filter((item) => !(item.alunoId === salvo.alunoId && item.mesReferencia === salvo.mesReferencia && item.anoReferencia === salvo.anoReferencia))]);
+      queryClient.setQueryData<FinanceiroAluno[]>(FINANCEIRO_QUERY_KEY, (current = []) => [
+        salvo,
+        ...current.filter((item) => !(item.alunoId === salvo.alunoId && item.mesReferencia === salvo.mesReferencia && item.anoReferencia === salvo.anoReferencia)),
+      ]);
     } finally { setSavingId(null); }
   };
 

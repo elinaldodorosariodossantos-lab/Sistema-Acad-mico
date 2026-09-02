@@ -1,6 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { FiDownload, FiFileText, FiGrid } from 'react-icons/fi';
 import { Card } from '../common';
 import { useAlunos } from '../../hooks/useAlunos';
@@ -95,7 +93,11 @@ export const Relatorios: React.FC = () => {
     registro.presenca || 'Não informado', registro.professorResponsavel || 'Não informado', registro.conteudoMinistrado || '',
   ]);
 
-  const exportarPdf = () => {
+  const exportarPdf = async () => {
+    const [{ jsPDF }, { default: autoTable }] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable'),
+    ]);
     const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
     doc.setFillColor(37, 99, 235); doc.rect(0, 0, doc.internal.pageSize.getWidth(), 72, 'F');
     doc.setTextColor(255, 255, 255); doc.setFontSize(20); doc.text('EDUKAR XP', 40, 31);

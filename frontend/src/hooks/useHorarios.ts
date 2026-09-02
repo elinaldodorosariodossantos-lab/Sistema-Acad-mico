@@ -7,7 +7,7 @@ export const useHorarios = () => {
   const [horarios, setHorarios] = useState<Horario[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { addNotification } = useAppStore();
+  const addNotification = useAppStore((state) => state.addNotification);
 
   const fetchHorarios = useCallback(async () => {
     setIsLoading(true);

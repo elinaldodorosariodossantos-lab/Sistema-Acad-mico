@@ -157,23 +157,6 @@ const assertSupabase = () => {
   return supabase;
 };
 
-const getAvailableTableColumns = async (client: any, tableName: string): Promise<Set<string>> => {
-  try {
-    const { data, error } = await client
-      .from('information_schema.columns')
-      .select('column_name')
-      .eq('table_name', tableName);
-
-    if (error || !Array.isArray(data)) {
-      return new Set();
-    }
-
-    return new Set(data.map((item: any) => String(item.column_name || '')));
-  } catch {
-    return new Set();
-  }
-};
-
 const isBackendUnavailableError = (error: unknown) => {
   if (!error) return false;
 
@@ -206,7 +189,6 @@ export const alunosService = {
 
   async create(aluno: Omit<Aluno, 'id'>): Promise<Aluno> {
     const client = assertSupabase();
-    const availableColumns = await getAvailableTableColumns(client, 'alunos');
     const payload: Record<string, any> = {
       nome: aluno.nome,
       cpf: aluno.cpf || null,
@@ -221,20 +203,9 @@ export const alunosService = {
       telefone: aluno.telefone,
       turma: aluno.turma,
       dias_aula: aluno.diasAula || [],
+      mensagem: aluno.mensagem || '',
       status: aluno.status,
     };
-
-    if (availableColumns.has('mensagem')) {
-      payload.mensagem = aluno.mensagem || '';
-    }
-
-    if (availableColumns.has('hora_inicio')) {
-      payload.hora_inicio = aluno.horaInicio || '';
-    }
-
-    if (availableColumns.has('hora_fim')) {
-      payload.hora_fim = aluno.horaFim || '';
-    }
 
     const { data, error } = await client.from('alunos').insert(payload).select().single();
     if (error) throw error;
@@ -243,7 +214,6 @@ export const alunosService = {
 
   async update(id: string, aluno: Partial<Aluno>): Promise<Aluno> {
     const client = assertSupabase();
-    const availableColumns = await getAvailableTableColumns(client, 'alunos');
     const payload: Record<string, any> = {
       ...(aluno.nome ? { nome: aluno.nome } : {}),
       ...(aluno.cpf !== undefined ? { cpf: aluno.cpf || null } : {}),
@@ -258,20 +228,9 @@ export const alunosService = {
       ...(aluno.telefone ? { telefone: aluno.telefone } : {}),
       ...(aluno.turma ? { turma: aluno.turma } : {}),
       ...(aluno.diasAula ? { dias_aula: aluno.diasAula } : {}),
+      ...(aluno.mensagem !== undefined ? { mensagem: aluno.mensagem } : {}),
       ...(aluno.status ? { status: aluno.status } : {}),
     };
-
-    if (availableColumns.has('mensagem') && aluno.mensagem !== undefined) {
-      payload.mensagem = aluno.mensagem;
-    }
-
-    if (availableColumns.has('hora_inicio') && aluno.horaInicio !== undefined) {
-      payload.hora_inicio = aluno.horaInicio || '';
-    }
-
-    if (availableColumns.has('hora_fim') && aluno.horaFim !== undefined) {
-      payload.hora_fim = aluno.horaFim || '';
-    }
 
     const { data, error } = await client.from('alunos').update(payload).eq('id', id).select().single();
     if (error) throw error;
@@ -284,7 +243,7 @@ export const alunosService = {
     if (error) throw error;
   },
 
-  async search(termo: string): Promise<Aluno[]> {
+  async search(termo: string, signal?: AbortSignal): Promise<Aluno[]> {
     const client = assertSupabase();
     const searchTerm = termo.trim();
     if (!searchTerm) return this.getAll();
@@ -293,7 +252,8 @@ export const alunosService = {
       .from('alunos')
       .select('*')
       .or(`nome.ilike.%${searchTerm}%,turma.ilike.%${searchTerm}%`)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .abortSignal(signal ?? new AbortController().signal);
 
     if (error) throw error;
     return (data || []).map(normalizeAluno);
@@ -325,11 +285,11 @@ export const turmasService = {
       return acc;
     }, {});
 
-    for (const turma of turmasData || []) {
+    await Promise.all((turmasData || []).map(async (turma) => {
       const quantidade = contagemPorTurma[turma.nome] || 0;
       const { error } = await client.from('turmas').update({ quantidade_alunos: quantidade }).eq('id', turma.id);
       if (error) throw error;
-    }
+    }));
   },
 
   async create(turma: Omit<Turma, 'id'>): Promise<Turma> {
