@@ -85,23 +85,21 @@ Todos os dados são armazenados exclusivamente no **Supabase**, que atua como ba
 
 ```text
 EDUKAR-XP/
-├── src/
-│   ├── components/
-│   │   ├── common/       Componentes reutilizáveis
-│   │   └── pages/        Páginas do sistema
-│   ├── context/          Estado compartilhado
-│   ├── hooks/            Hooks dos módulos acadêmicos
-│   ├── lib/              Configuração do Supabase
-│   ├── services/         Operações de leitura e persistência
-│   ├── styles/           Estilos globais e temas
-│   └── types/            Tipos TypeScript
-├── supabase/
-│   ├── schema.sql        Estrutura acadêmica
-│   ├── alunos_dados.sql  Dados complementares dos alunos
-│   └── financeiro.sql    Estrutura financeira
-├── .env.example
-├── package.json
-└── vite.config.ts
+├── frontend/
+│   ├── src/
+│   │   ├── components/   Componentes e páginas
+│   │   ├── hooks/        Hooks dos módulos acadêmicos
+│   │   ├── lib/          Configuração do Supabase
+│   │   ├── services/     Operações de leitura e persistência
+│   │   └── types/        Tipos TypeScript
+│   ├── .env.example
+│   ├── package.json
+│   └── vite.config.ts
+└── backend/
+    └── supabase/
+        ├── schema.sql        Estrutura acadêmica
+        ├── alunos_dados.sql  Dados complementares dos alunos
+        └── financeiro.sql    Estrutura financeira
 ```
 
 ## Instalação
@@ -115,6 +113,7 @@ EDUKAR-XP/
 ### 1. Instale as dependências
 
 ```bash
+cd frontend
 npm install
 ```
 
@@ -134,9 +133,9 @@ Nunca exponha uma chave `service_role` no frontend.
 Execute os scripts abaixo no SQL Editor do Supabase, nesta ordem:
 
 ```text
-supabase/schema.sql
-supabase/alunos_dados.sql
-supabase/financeiro.sql
+backend/supabase/schema.sql
+backend/supabase/alunos_dados.sql
+backend/supabase/financeiro.sql
 ```
 
 ### 4. Execute o projeto
@@ -166,7 +165,7 @@ npm run build
 
 ## Persistência
 
-O cliente Supabase é inicializado em `src/lib/supabase.ts`. As operações acadêmicas e financeiras estão centralizadas em `src/services/api.ts`, garantindo uma única camada de acesso aos dados.
+O cliente Supabase é inicializado em `frontend/src/lib/supabase.ts`. As operações acadêmicas e financeiras estão centralizadas em `frontend/src/services/api.ts`, garantindo uma única camada de acesso aos dados.
 
 ## Documentação adicional
 

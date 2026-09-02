@@ -8,21 +8,26 @@
 
 ## 1. Instalar dependências
 
-Na raiz do projeto, execute `npm install`.
+Entre na pasta do frontend e instale as dependências:
+
+```bash
+cd frontend
+npm install
+```
 
 ## 2. Configurar o Supabase
 
 Abra o SQL Editor do projeto Supabase e execute, nesta ordem:
 
-1. `supabase/schema.sql`
-2. `supabase/alunos_dados.sql`
-3. `supabase/financeiro.sql`
+1. `backend/supabase/schema.sql`
+2. `backend/supabase/alunos_dados.sql`
+3. `backend/supabase/financeiro.sql`
 
 Esses scripts criam as tabelas, relacionamentos, índices, gatilhos e políticas necessárias.
 
 ## 3. Configurar o ambiente
 
-Crie um arquivo `.env` com base no `.env.example`:
+Crie `frontend/.env` com base em `frontend/.env.example`:
 
 ```env
 VITE_SUPABASE_URL=https://SEU_PROJETO.supabase.co
@@ -53,4 +58,4 @@ Revise no Supabase as políticas de Row Level Security definidas pelos scripts S
 
 ## Arquitetura de dados
 
-O frontend inicializa o Supabase em `src/lib/supabase.ts`. As operações dos módulos acadêmicos e financeiros ficam centralizadas em `src/services/api.ts`.
+O frontend inicializa o Supabase em `frontend/src/lib/supabase.ts`. As operações dos módulos acadêmicos e financeiros ficam centralizadas em `frontend/src/services/api.ts`.
