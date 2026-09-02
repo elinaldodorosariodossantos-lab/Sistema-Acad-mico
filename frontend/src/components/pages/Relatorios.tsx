@@ -188,7 +188,7 @@ export const Relatorios: React.FC = () => {
         <h2>Gerar relatório filtrado</h2>
         <p>Confira um resumo antes de baixar o arquivo.</p>
       </div>
-      <button type="button" className="report-generate-button" disabled={!podeGerar} onClick={() => setResumoAberto(true)}>Visualizar relatório</button>
+      <button type="button" className="report-generate-button" disabled={!podeGerar} onClick={() => setResumoAberto(true)}>Gerar Relatório</button>
     </Card>
 
     {resumoAberto && <Card padding="lg" className="report-preview-card">
