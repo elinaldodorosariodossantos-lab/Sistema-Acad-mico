@@ -9,6 +9,8 @@ export interface Aluno {
 
   dataNascimento: string;
 
+  dataInicio: string;
+
   responsavel: string;
 
   cpfResponsavel?: string;

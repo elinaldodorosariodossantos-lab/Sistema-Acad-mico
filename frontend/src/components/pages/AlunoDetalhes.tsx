@@ -70,6 +70,7 @@ export const AlunoDetalhes: React.FC = () => {
             <div><dt>Nome completo</dt><dd>{aluno.nome}</dd></div>
             <div><dt>CPF</dt><dd>{valueOrFallback(aluno.cpf)}</dd></div>
             <div><dt>Data de nascimento</dt><dd>{formatDate(aluno.dataNascimento)}</dd></div>
+            <div><dt>Data de início</dt><dd>{formatDate(aluno.dataInicio)}</dd></div>
             <div><dt>Status</dt><dd>{aluno.status || 'Ativo'}</dd></div>
             <div><dt>Cadastrado em</dt><dd>{formatDate(aluno.createdAt, true)}</dd></div>
             <div><dt>Última atualização</dt><dd>{formatDate(aluno.updatedAt, true)}</dd></div>

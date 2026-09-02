@@ -290,6 +290,10 @@ body.dark-mode .form-group label {
   grid-template-columns: 1fr 1fr 100px;
 }
 
+.form-row-student {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .responsavel-cell {
   display: flex;
   min-width: 180px;
@@ -418,6 +422,10 @@ body.dark-mode .aluno-details-grid dt {
   }
 
   .form-row-address {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row-student {
     grid-template-columns: 1fr;
   }
 

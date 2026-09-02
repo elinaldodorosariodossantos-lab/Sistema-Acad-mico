@@ -1,6 +1,7 @@
 alter table public.alunos
   add column if not exists cpf text,
   add column if not exists data_nascimento text,
+  add column if not exists data_inicio date,
   add column if not exists responsavel text,
   add column if not exists cpf_responsavel text,
   add column if not exists endereco text,

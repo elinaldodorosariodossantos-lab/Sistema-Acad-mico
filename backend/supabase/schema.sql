@@ -28,6 +28,7 @@ create table if not exists alunos (
   id uuid primary key default gen_random_uuid(),
   nome text not null,
   data_nascimento text,
+  data_inicio date,
   responsavel text,
   cpf_responsavel text,
   endereco text,

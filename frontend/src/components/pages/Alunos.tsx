@@ -103,6 +103,7 @@ export const Alunos: React.FC = () => {
       nome: '',
       cpf: '',
       dataNascimento: '',
+      dataInicio: '',
       responsavel: '',
       cpfResponsavel: '',
       endereco: '',
@@ -143,6 +144,7 @@ export const Alunos: React.FC = () => {
         nome: '',
         cpf: '',
         dataNascimento: '',
+        dataInicio: '',
         responsavel: '',
         cpfResponsavel: '',
         endereco: '',
@@ -460,7 +462,7 @@ export const Alunos: React.FC = () => {
             />
           </div>
 
-          <div className="form-row">
+          <div className="form-row form-row-student">
             <div className="form-group">
               <label>CPF do Aluno <span className="optional-label">(opcional)</span></label>
               <input type="text" inputMode="numeric" maxLength={14} placeholder="000.000.000-00" value={formData.cpf || ''} onChange={(e) => setFormData({ ...formData, cpf: formatCpf(e.target.value) })} />
@@ -485,6 +487,16 @@ export const Alunos: React.FC = () => {
                       e.target.value,
                   })
                 }
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Data de início *</label>
+              <input
+                type="date"
+                required
+                value={formData.dataInicio || ''}
+                onChange={(e) => setFormData({ ...formData, dataInicio: e.target.value })}
               />
             </div>
 
