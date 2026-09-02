@@ -272,3 +272,257 @@ body.dark-mode .aluno-nome {
     flex-direction: column;
   }
 }
+
+/* Professional attendance workspace */
+.frequencia-container {
+  max-width: 1320px;
+  gap: 1.25rem;
+}
+
+.frequencia-container > .frequencia-header {
+  position: relative;
+  overflow: hidden;
+  min-height: 132px;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid #dbeafe;
+  border-radius: 20px;
+  background: radial-gradient(circle at 90% 15%, rgba(59, 130, 246, .16), transparent 28%),
+    linear-gradient(135deg, #ffffff, #f6f9ff);
+  box-shadow: 0 14px 36px rgba(15, 23, 42, .06);
+}
+
+.frequencia-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  margin-bottom: .45rem;
+  color: #2563eb;
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+
+.frequencia-eyebrow::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 5px rgba(34, 197, 94, .1);
+}
+
+.frequencia-container > .frequencia-header h1 {
+  font-size: clamp(1.55rem, 3vw, 2rem);
+  letter-spacing: -.035em;
+}
+
+.frequencia-container > .frequencia-header p {
+  max-width: 560px;
+  font-size: .92rem;
+}
+
+.frequencia-container .frequencia-filters {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.frequencia-filters > .card,
+.frequencia-content > .card {
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 9px 28px rgba(15, 23, 42, .045);
+}
+
+.frequencia-filter-heading,
+.frequencia-section-heading {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  margin-bottom: 1.15rem;
+}
+
+.frequencia-filter-heading > span,
+.frequencia-section-heading > span,
+.turma-info-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 12px;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.frequencia-filter-heading h2,
+.frequencia-section-heading h3,
+.frequencia-filter-heading p,
+.frequencia-section-heading p {
+  margin: 0;
+}
+
+.frequencia-filter-heading h2,
+.frequencia-section-heading h3 {
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.frequencia-filter-heading p,
+.frequencia-section-heading p {
+  margin-top: .2rem;
+  color: #64748b;
+  font-size: .78rem;
+}
+
+.frequencia-filter-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.frequencia-filter-fields .filter-group label {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  color: #475569;
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.frequencia-filter-fields input,
+.frequencia-filter-fields select {
+  min-height: 48px;
+  padding: .7rem .85rem;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  color: #1e293b;
+  background: #f8fafc;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.frequencia-filter-fields input:focus,
+.frequencia-filter-fields select:focus {
+  outline: 0;
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, .09);
+}
+
+.turma-info-main {
+  display: flex;
+  align-items: flex-start;
+  gap: .9rem;
+}
+
+.turma-info-main h2 { font-size: 1.25rem; letter-spacing: -.025em; }
+.turma-info-main p { display: flex; align-items: center; gap: .3rem; margin-top: .35rem; }
+
+.frequencia-live-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(88px, 1fr));
+  gap: .55rem;
+}
+
+.frequencia-live-summary div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0 .5rem;
+  min-width: 105px;
+  padding: .7rem .8rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.frequencia-live-summary svg { grid-row: 1 / 3; width: 19px; height: 19px; }
+.frequencia-live-summary strong { color: #1e293b; font-size: 1.1rem; line-height: 1; }
+.frequencia-live-summary span { color: #64748b; font-size: .67rem; font-weight: 700; }
+.frequencia-live-summary .total svg { color: #2563eb; }
+.frequencia-live-summary .present svg { color: #059669; }
+.frequencia-live-summary .absent svg { color: #dc2626; }
+
+.frequencia-container .alunos-lista {
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.frequencia-container .alunos-header {
+  border-radius: 0;
+  border-bottom-width: 1px;
+  color: #64748b;
+  background: #f8fafc;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.frequencia-container .aluno-row:last-child { border-bottom: 0; }
+.frequencia-container .aluno-row:hover { background: #f8fbff; }
+.frequencia-container .aluno-nome { font-weight: 650; }
+
+.frequencia-container .presenca-btn {
+  min-width: 128px;
+  min-height: 40px;
+  border-radius: 11px;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, .04);
+}
+
+.frequencia-container .presenca-btn:hover { transform: translateY(-1px); }
+.frequencia-container .presenca-btn.presente { border-color: #a7f3d0; color: #047857; background: #ecfdf5; }
+.frequencia-container .presenca-btn.falta { border-color: #fecaca; color: #b91c1c; background: #fef2f2; }
+
+.frequencia-content .form-group input,
+.frequencia-content .form-group textarea {
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.frequencia-actions { margin-top: .25rem; }
+.frequencia-actions .btn { min-width: 220px; min-height: 50px; border-radius: 13px; box-shadow: 0 10px 22px rgba(5, 150, 105, .2); }
+
+body.dark-mode .frequencia-container > .frequencia-header {
+  border-color: rgba(96, 165, 250, .16);
+  background: radial-gradient(circle at 90% 15%, rgba(59, 130, 246, .14), transparent 28%),
+    linear-gradient(135deg, #1d293b, var(--dark-surface));
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .16);
+}
+
+body.dark-mode .frequencia-filters > .card,
+body.dark-mode .frequencia-content > .card,
+body.dark-mode .frequencia-container .alunos-lista {
+  border-color: var(--dark-border);
+  background: var(--dark-surface);
+}
+
+body.dark-mode .frequencia-filter-heading h2,
+body.dark-mode .frequencia-section-heading h3,
+body.dark-mode .frequencia-live-summary strong { color: var(--dark-text); }
+body.dark-mode .frequencia-filter-heading p,
+body.dark-mode .frequencia-section-heading p { color: var(--gray-400); }
+body.dark-mode .frequencia-filter-heading > span,
+body.dark-mode .frequencia-section-heading > span,
+body.dark-mode .turma-info-icon { color: #93c5fd; background: rgba(37, 99, 235, .16); }
+body.dark-mode .frequencia-filter-fields input,
+body.dark-mode .frequencia-filter-fields select,
+body.dark-mode .frequencia-live-summary div { border-color: var(--dark-border); color: var(--dark-text); background: var(--dark-bg); }
+body.dark-mode .frequencia-container .aluno-row:hover { background: rgba(59, 130, 246, .06); }
+
+@media (max-width: 900px) {
+  .turma-info-header { flex-direction: column; }
+  .frequencia-live-summary { width: 100%; }
+}
+
+@media (max-width: 620px) {
+  .frequencia-filter-fields { grid-template-columns: 1fr; }
+  .frequencia-live-summary { grid-template-columns: 1fr; }
+  .frequencia-live-summary div { min-width: 0; }
+  .frequencia-container .alunos-header,
+  .frequencia-container .aluno-row { grid-template-columns: 1fr 112px; }
+  .frequencia-container .presenca-btn { min-width: 104px; }
+}

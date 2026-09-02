@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Modal } from '../common';
-import { FiPlus, FiSave } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { Card, Button } from '../common';
+import { FiBookOpen, FiCalendar, FiCheckCircle, FiClock, FiSave, FiUsers, FiXCircle } from 'react-icons/fi';
 import { useFrequencia } from '../../hooks/useFrequencia';
 import { useTurmas } from '../../hooks/useTurmas';
 import { useAlunos } from '../../hooks/useAlunos';
@@ -73,6 +74,7 @@ const getHorarioDisplay = (
 };
 
 export const Frequencia: React.FC = () => {
+  const navigate = useNavigate();
   const { registrarMultipla } =
     useFrequencia();
 
@@ -92,7 +94,7 @@ export const Frequencia: React.FC = () => {
     setSelectedTurma,
   ] = useState('');
 
-  const [isModalOpen, setIsModalOpen] =
+  const [isSaving, setIsSaving] =
     useState(false);
 
   const [
@@ -141,6 +143,11 @@ export const Frequencia: React.FC = () => {
       );
     }, [alunos, turmaAtual]);
 
+  const totalPresentes = alunosDaTurma.filter(
+    (aluno) => (frequenciaData[aluno.id]?.presenca || 'Presente') === 'Presente'
+  ).length;
+  const totalFaltas = alunosDaTurma.length - totalPresentes;
+
   useEffect(() => {
     const newData: typeof frequenciaData =
       {};
@@ -185,6 +192,8 @@ export const Frequencia: React.FC = () => {
 
   const handleSalvarFrequencia =
     async () => {
+      if (isSaving) return;
+
       if (!selectedTurma) {
         alert(
           'Selecione uma turma'
@@ -193,6 +202,12 @@ export const Frequencia: React.FC = () => {
         return;
       }
 
+      if (alunosDaTurma.length === 0) {
+        alert('Não há alunos vinculados a esta turma.');
+        return;
+      }
+
+      setIsSaving(true);
       try {
         const frequencias: Omit<
           FrequenciaType,
@@ -231,38 +246,20 @@ export const Frequencia: React.FC = () => {
           })
         );
 
-        await registrarMultipla(
+        const registrosSalvos = await registrarMultipla(
           frequencias
         );
 
-        alert(
-          'Frequência registrada com sucesso!'
-        );
+        if (registrosSalvos.length !== frequencias.length) return;
 
-        const resetData: typeof frequenciaData =
-          {};
-
-        alunosDaTurma.forEach(
-          (aluno) => {
-            resetData[aluno.id] = {
-              presenca:
-                'Presente',
-
-              conteudo: '',
-
-              observacoes: '',
-            };
-          }
-        );
-
-        setFrequenciaData(
-          resetData
-        );
+        navigate('/');
       } catch (error) {
         console.error(
           'Erro ao salvar frequência:',
           error
         );
+      } finally {
+        setIsSaving(false);
       }
     };
 
@@ -270,6 +267,7 @@ export const Frequencia: React.FC = () => {
     <div className="frequencia-container">
       <div className="frequencia-header">
         <div>
+          <span className="frequencia-eyebrow">REGISTRO DE AULA</span>
           <h1>
             Controle de Frequência
           </h1>
@@ -283,8 +281,13 @@ export const Frequencia: React.FC = () => {
 
       <div className="frequencia-filters">
         <Card padding="lg">
+          <div className="frequencia-filter-heading">
+            <span><FiCalendar /></span>
+            <div><h2>Selecione a aula</h2><p>Informe a data e a turma para registrar a chamada.</p></div>
+          </div>
+          <div className="frequencia-filter-fields">
           <div className="filter-group">
-            <label>Data</label>
+            <label><FiCalendar /> Data</label>
 
             <input
               type="date"
@@ -300,7 +303,7 @@ export const Frequencia: React.FC = () => {
           </div>
 
           <div className="filter-group">
-            <label>Turma</label>
+            <label><FiUsers /> Turma</label>
 
             <select
               value={
@@ -331,6 +334,7 @@ export const Frequencia: React.FC = () => {
               )}
             </select>
           </div>
+          </div>
         </Card>
       </div>
 
@@ -339,7 +343,9 @@ export const Frequencia: React.FC = () => {
           <div className="frequencia-content">
             <Card padding="lg">
               <div className="turma-info-header">
-                <div>
+                <div className="turma-info-main">
+                  <span className="turma-info-icon"><FiBookOpen /></span>
+                  <div>
                   <h2>
                     {
                       turmaAtual.nome
@@ -347,14 +353,14 @@ export const Frequencia: React.FC = () => {
                   </h2>
 
                   <p>
-                    Professor:{' '}
+                    <strong>Professor:</strong>{' '}
                     {
                       turmaAtual.professor
                     }
                   </p>
 
                   <p>
-                    Horário:{' '}
+                    <FiClock /> <strong>Horário:</strong>{' '}
                     {getHorarioDisplay(
                       turmaAtual.horario,
                       turmaAtual.horaInicio,
@@ -362,25 +368,19 @@ export const Frequencia: React.FC = () => {
                     ) ||
                       'Não definido'}
                   </p>
+                  </div>
                 </div>
 
-                <div className="alunos-count">
-                  <span className="count-badge">
-                    {
-                      alunosDaTurma.length
-                    }
-                  </span>
-
-                  <p>Alunos</p>
+                <div className="frequencia-live-summary">
+                  <div className="total"><FiUsers /><strong>{alunosDaTurma.length}</strong><span>Alunos</span></div>
+                  <div className="present"><FiCheckCircle /><strong>{totalPresentes}</strong><span>Presentes</span></div>
+                  <div className="absent"><FiXCircle /><strong>{totalFaltas}</strong><span>Faltas</span></div>
                 </div>
               </div>
             </Card>
 
             <Card padding="lg">
-              <h3>
-                Frequência dos
-                Alunos
-              </h3>
+              <div className="frequencia-section-heading"><span><FiUsers /></span><div><h3>Frequência dos Alunos</h3><p>Clique no status para alternar entre presença e falta.</p></div></div>
 
               <div className="alunos-lista">
                 <div className="alunos-header">
@@ -419,6 +419,7 @@ export const Frequencia: React.FC = () => {
 
                         <div className="presenca-col">
                           <button
+                            type="button"
                             className={`presenca-btn ${
                               (
                                 frequenciaData[
@@ -459,9 +460,7 @@ export const Frequencia: React.FC = () => {
             </Card>
 
             <Card padding="lg">
-              <h3>
-                Conteúdo da Aula
-              </h3>
+              <div className="frequencia-section-heading"><span><FiBookOpen /></span><div><h3>Conteúdo da Aula</h3><p>Registre o tema e as observações da aula.</p></div></div>
 
               <div className="form-group">
                 <label>
@@ -517,9 +516,9 @@ export const Frequencia: React.FC = () => {
                 onClick={
                   handleSalvarFrequencia
                 }
+                loading={isSaving}
               >
-                Salvar
-                Frequência
+                {isSaving ? 'Salvando...' : 'Salvar Frequência'}
               </Button>
             </div>
           </div>
