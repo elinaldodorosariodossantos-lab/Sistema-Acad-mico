@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FiDownload, FiFileText, FiGrid } from 'react-icons/fi';
 import { Card } from '../common';
 import { useAlunos } from '../../hooks/useAlunos';
@@ -52,6 +52,15 @@ export const Relatorios: React.FC = () => {
   const [pesquisaAluno, setPesquisaAluno] = useState('');
   const [turmaSelecionada, setTurmaSelecionada] = useState('Todas');
   const [resumoAberto, setResumoAberto] = useState(false);
+  const resumoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!resumoAberto) return;
+    const frame = window.requestAnimationFrame(() => {
+      resumoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [resumoAberto, alunoSelecionado, turmaSelecionada, tipoRelatorio]);
 
   const alunosOrdenados = useMemo(() => [...alunos].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')), [alunos]);
   const alunosPesquisados = useMemo(() => {
@@ -106,9 +115,6 @@ export const Relatorios: React.FC = () => {
   const escopo = tipoRelatorio === 'aluno' && alunoSelecionado !== 'Todos'
     ? alunoSelecionado
     : tipoRelatorio === 'turma' && turmaSelecionada !== 'Todas' ? turmaSelecionada : 'GERAL';
-  const podeGerar = tipoRelatorio === 'geral'
-    || (tipoRelatorio === 'aluno' && alunoSelecionado !== 'Todos')
-    || (tipoRelatorio === 'turma' && turmaSelecionada !== 'Todas');
   const linhasExportacao = frequenciasFiltradas.map((registro) => [
     formatarData(registro.data), nomeTurma(registro.turma), registro.aluno || 'Não informado',
     registro.presenca || 'Não informado', registro.professorResponsavel || 'Não informado', registro.conteudoMinistrado || '',
@@ -239,7 +245,7 @@ export const Relatorios: React.FC = () => {
     <Card padding="lg" className="report-filter-card">
       <div className="report-section-title"><div><span>FILTROS</span><h2>Período e escopo</h2></div><p>Os resultados e exportações são atualizados automaticamente.</p></div>
       <div className="report-type-selector" role="radiogroup" aria-label="Tipo de relatório">
-        <label className={tipoRelatorio === 'geral' ? 'active' : ''}><input type="radio" name="tipo-relatorio" checked={tipoRelatorio === 'geral'} onChange={() => { setTipoRelatorio('geral'); setAlunoSelecionado('Todos'); setPesquisaAluno(''); setTurmaSelecionada('Todas'); setResumoAberto(false); }} /><span><b>Relatório Geral</b><small>Todos os alunos e turmas</small></span></label>
+        <label className={tipoRelatorio === 'geral' ? 'active' : ''} onClick={() => { if (tipoRelatorio === 'geral') setResumoAberto(true); }}><input type="radio" name="tipo-relatorio" checked={tipoRelatorio === 'geral'} onChange={() => { setTipoRelatorio('geral'); setAlunoSelecionado('Todos'); setPesquisaAluno(''); setTurmaSelecionada('Todas'); setResumoAberto(true); }} /><span><b>Relatório Geral</b><small>Todos os alunos e turmas</small></span></label>
         <label className={tipoRelatorio === 'aluno' ? 'active' : ''}><input type="radio" name="tipo-relatorio" checked={tipoRelatorio === 'aluno'} onChange={() => { setTipoRelatorio('aluno'); setTurmaSelecionada('Todas'); setResumoAberto(false); }} /><span><b>Por Aluno</b><small>Frequência individual</small></span></label>
         <label className={tipoRelatorio === 'turma' ? 'active' : ''}><input type="radio" name="tipo-relatorio" checked={tipoRelatorio === 'turma'} onChange={() => { setTipoRelatorio('turma'); setAlunoSelecionado('Todos'); setPesquisaAluno(''); setResumoAberto(false); }} /><span><b>Por Turma</b><small>Presenças e faltas da turma</small></span></label>
       </div>
@@ -251,25 +257,16 @@ export const Relatorios: React.FC = () => {
             <div className="report-search-combobox">
               <div className="report-search-field"><span aria-hidden="true">⌕</span><input type="search" role="combobox" aria-expanded={Boolean(pesquisaAluno && alunoSelecionado === 'Todos')} value={pesquisaAluno} placeholder="Digite o nome do aluno" onChange={(e) => { setPesquisaAluno(e.target.value); setAlunoSelecionado('Todos'); setResumoAberto(false); }} /></div>
               {pesquisaAluno && alunoSelecionado === 'Todos' && <div className="report-search-results" role="listbox">
-                {alunosPesquisados.length ? alunosPesquisados.slice(0, 8).map((aluno) => <button key={aluno.id} type="button" role="option" onClick={() => { setAlunoSelecionado(aluno.nome); setPesquisaAluno(aluno.nome); setResumoAberto(false); }}><span className="report-student-avatar">{aluno.nome.charAt(0).toUpperCase()}</span><span><strong>{aluno.nome}</strong><small>{aluno.turma || 'Sem turma'}</small></span></button>) : <p>Nenhum aluno encontrado.</p>}
+                {alunosPesquisados.length ? alunosPesquisados.slice(0, 8).map((aluno) => <button key={aluno.id} type="button" role="option" onClick={() => { setAlunoSelecionado(aluno.nome); setPesquisaAluno(aluno.nome); setResumoAberto(true); }}><span className="report-student-avatar">{aluno.nome.charAt(0).toUpperCase()}</span><span><strong>{aluno.nome}</strong><small>{aluno.turma || 'Sem turma'}</small></span></button>) : <p>Nenhum aluno encontrado.</p>}
               </div>}
             </div>
           </label>
         </div>}
-        {tipoRelatorio === 'turma' && <label>Selecionar Turma<select value={turmaSelecionada} onChange={(e) => { setTurmaSelecionada(e.target.value); setResumoAberto(false); }}><option value="Todas">Selecione uma turma</option>{turmasOrdenadas.map((turma) => <option key={turma.id} value={turma.nome}>{turma.nome}</option>)}</select></label>}
+        {tipoRelatorio === 'turma' && <label>Selecionar Turma<select value={turmaSelecionada} onChange={(e) => { const turma = e.target.value; setTurmaSelecionada(turma); setResumoAberto(turma !== 'Todas'); }}><option value="Todas">Selecione uma turma</option>{turmasOrdenadas.map((turma) => <option key={turma.id} value={turma.nome}>{turma.nome}</option>)}</select></label>}
       </div>
     </Card>
 
-    <Card padding="lg" className="report-generator-card">
-      <div>
-        <span>RELATÓRIO DE FREQUÊNCIA</span>
-        <h2>Gerar relatório filtrado</h2>
-        <p>Confira um resumo antes de baixar o arquivo.</p>
-      </div>
-      <button type="button" className="report-generate-button" disabled={!podeGerar} onClick={() => setResumoAberto(true)}>Gerar relatório</button>
-    </Card>
-
-    {resumoAberto && <Card padding="lg" className="report-preview-card">
+    {resumoAberto && <div ref={resumoRef} className="report-preview-anchor"><Card padding="lg" className="report-preview-card">
       <div className="report-preview-header">
         <div><span>RESUMO DO ARQUIVO</span><h2>Relatório pronto para baixar</h2></div>
         <button type="button" className="report-preview-close" onClick={() => setResumoAberto(false)} aria-label="Fechar resumo">×</button>
@@ -287,7 +284,7 @@ export const Relatorios: React.FC = () => {
       </div>
       {resumoTurma && <p className="report-preview-detail"><strong>{resumoTurma.nome}</strong> · {resumoTurma.professor} · {resumoTurma.horario} · {resumoTurma.alunos} alunos</p>}
       <div className="report-preview-download"><div><strong>Escolha o formato</strong><small>O arquivo respeitará todos os filtros acima.</small></div>{botoesExportacao()}</div>
-    </Card>}
+    </Card></div>}
 
     <Card padding="lg" className="report-card-block">
       <div className="report-section-title"><div><span>DETALHAMENTO</span><h2>Frequência por Aluno</h2></div><strong>{periodo}</strong></div>

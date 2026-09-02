@@ -76,6 +76,7 @@
 .report-generate-button:hover { transform: translateY(-1px); box-shadow: 0 12px 22px rgba(37,99,235,.28); }
 .report-generate-button:disabled { cursor: not-allowed; transform: none; box-shadow: none; opacity: .5; }
 .report-preview-card { border-radius: 1rem; border: 1px solid #bfdbfe; box-shadow: 0 18px 40px rgba(15,23,42,.08); }
+.report-preview-anchor { scroll-margin-top: 1rem; }
 .report-preview-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb; }
 .report-preview-close { display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; color: #64748b; background: #f1f5f9; border-radius: 50%; font-size: 1.25rem; }
 .report-preview-scope { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; margin: 1.25rem 0; }
