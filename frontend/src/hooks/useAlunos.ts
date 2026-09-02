@@ -35,8 +35,10 @@ export const useAlunos = () => {
       const next = [created, ...current];
       queryClient.setQueryData(ALUNOS_QUERY_KEY, next);
       setSearchResults(null);
-      await syncTurmasAfterMutation(next);
       addNotification('Aluno criado com sucesso!', 'success');
+      void syncTurmasAfterMutation(next).catch(() => {
+        queryClient.invalidateQueries({ queryKey: TURMAS_QUERY_KEY });
+      });
       return created;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Erro ao criar aluno';

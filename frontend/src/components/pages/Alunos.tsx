@@ -86,6 +86,9 @@ export const Alunos: React.FC = () => {
   const [isModalOpen, setIsModalOpen] =
     useState(false);
 
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+
   const [searchTerm, setSearchTerm] =
     useState('');
 
@@ -163,7 +166,9 @@ export const Alunos: React.FC = () => {
     e: React.FormEvent
   ) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       if (editingAluno) {
         await updateAluno(
@@ -183,6 +188,8 @@ export const Alunos: React.FC = () => {
         'Erro ao salvar aluno:',
         error
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -373,7 +380,9 @@ export const Alunos: React.FC = () => {
 
       <Modal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        onClose={() => {
+          if (!isSubmitting) handleCloseModal();
+        }}
         title={
           editingAluno
             ? 'Editar Aluno'
@@ -387,16 +396,22 @@ export const Alunos: React.FC = () => {
               onClick={
                 handleCloseModal
               }
+              disabled={isSubmitting}
             >
               Cancelar
             </Button>
 
             <Button
               onClick={handleSubmit}
+              loading={isSubmitting}
             >
-              {editingAluno
-                ? 'Atualizar'
-                : 'Criar'}
+              {isSubmitting
+                ? editingAluno
+                  ? 'Atualizando...'
+                  : 'Criando...'
+                : editingAluno
+                  ? 'Atualizar'
+                  : 'Criar'}
             </Button>
           </div>
         }
